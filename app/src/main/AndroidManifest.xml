@@ -12,6 +12,12 @@
     android:supportsRtl="true"
     android:theme="@style/Theme.AR_Nav"
     tools:targetApi="31">
+
+
+    <meta-data
+      android:name="com.google.android.geo.API_KEY"
+      android:value="AIzaSyBWV1jjPwu8j-CRZs4WcbmQz_OCRv2X_bo" />
+
     <activity
       android:name=".MainActivity"
       android:exported="true">
