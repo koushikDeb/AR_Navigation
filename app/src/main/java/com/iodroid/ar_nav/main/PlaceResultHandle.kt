@@ -1,4 +1,4 @@
-package com.iodroid.ar_nav
+package com.iodroid.ar_nav.main
 
 import android.content.ContentValues
 import android.content.Intent
@@ -7,8 +7,12 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.Autocomplete
 import com.google.android.libraries.places.widget.AutocompleteActivity
+import com.iodroid.ar_nav.main.MainActivity
 
-fun MainActivity.handleResult(resultCode: Int, data: Intent?): Place? {
+const val START_REQUEST_CODE = 20
+const val END_REQUEST_CODE = 21
+
+fun handleResult(resultCode: Int, data: Intent?): Place? {
     when (resultCode) {
         AppCompatActivity.RESULT_OK -> {
             data?.let {
@@ -26,4 +30,20 @@ fun MainActivity.handleResult(resultCode: Int, data: Intent?): Place? {
         }
     }
     return null
+}
+
+fun MainActivity.onResult(
+    requestCode: Int,
+    resultCode: Int,
+    data: Intent?
+) {
+    if (requestCode == START_REQUEST_CODE) {
+        handleResult(resultCode, data)?.let { place ->
+            viewModel.setStart(place)
+        }
+    } else if (requestCode == END_REQUEST_CODE) {
+        handleResult(resultCode, data)?.let { place ->
+            viewModel.setEnd(place)
+        }
+    }
 }
