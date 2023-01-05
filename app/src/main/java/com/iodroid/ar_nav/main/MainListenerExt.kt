@@ -11,17 +11,16 @@ internal fun MainActivity.initPlaces() {
 }
 
 internal fun MainActivity.initListeners() {
-    binding.startLocation.setOnClickListener {
-        startActivityForResult(getAutoCompleteIntent(), START_REQUEST_CODE)
-    }
+//    binding.startLocation.setOnClickListener {
+////        startActivityForResult(getAutoCompleteIntent(), START_REQUEST_CODE)
+//    }
     binding.endLocation.setOnClickListener {
         startActivityForResult(getAutoCompleteIntent(), END_REQUEST_CODE)
     }
 
-
-    viewModel.startPlace.observe(this){ start ->
-        binding.startLocationTv.text = start?.name?:getString(R.string.start_location)
-    }
+//    viewModel.startPlace.observe(this){ start ->
+//        binding.startLocationTv.text = start?.name?:getString(R.string.start_location)
+//    }
     viewModel.endPlace.observe(this){ end->
         binding.endLocationTv.text = end?.name?:getString(R.string.end_location)
     }
