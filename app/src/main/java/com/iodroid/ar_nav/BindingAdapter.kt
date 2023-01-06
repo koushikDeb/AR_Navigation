@@ -2,7 +2,6 @@ package com.iodroid.ar_nav
 
 import android.content.res.Configuration
 import androidx.constraintlayout.widget.Guideline
-import androidx.databinding.BindingMethod
 
 object BindingAdapter {
     @JvmStatic
