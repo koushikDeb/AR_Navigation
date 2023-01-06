@@ -20,6 +20,8 @@ import com.iodroid.ar_nav.utils.isLocationPermissionGranted
 
 class MainActivity : AppCompatActivity() {
 
+    var isPermissionCheckedOnce = false
+
     internal lateinit var binding: ActivityMainBinding
     internal val viewModel: NavSharedViewModel by viewModels()
     lateinit var locationPermissionRequest: ActivityResultLauncher<Array<String>>
@@ -35,6 +37,8 @@ class MainActivity : AppCompatActivity() {
         binding.viewModel = viewModel
         viewModel.setOrientation(this.resources.configuration.orientation)
 
+        isPermissionCheckedOnce = false
+
         if (isLocationPermissionGranted(this)) {
             initPlaces()
             initListeners()
@@ -47,31 +51,51 @@ class MainActivity : AppCompatActivity() {
         locationPermissionRequest = registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
         ) { permissions ->
-            when {
-                permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
-                    initPlaces()
-                    initListeners()
-                }
-                permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
-                    Toast.makeText(this, getString(R.string.fine_loc_message), Toast.LENGTH_LONG)
-                        .show()
-                    createDialog(
-                        context = this,
-                        title = getString(R.string.permission_not_granted),
-                        desc = getString(R.string.fine_loc_message)
-                    )
-                }
-                else -> {
-                    Toast.makeText(this, getString(R.string.fine_loc_message), Toast.LENGTH_LONG)
-                        .show()
+            if (!isPermissionCheckedOnce) {
+                when {
+                    permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
+                        initPlaces()
+                        initListeners()
+                    }
+                    permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
+                        Toast.makeText(
+                            this,
+                            getString(R.string.fine_loc_message),
+                            Toast.LENGTH_LONG
+                        )
+                            .show()
+                        createDialog(
+                            context = this,
+                            title = getString(R.string.permission_not_granted),
+                            desc = getString(R.string.fine_loc_message),
+                            isPermissionCheckedOnce
+                        )
+                    }
+                    else -> {
+                        Toast.makeText(
+                            this,
+                            getString(R.string.fine_loc_message),
+                            Toast.LENGTH_LONG
+                        )
+                            .show()
 
-                    createDialog(
-                        context = this,
-                        title = getString(R.string.permission_not_granted),
-                        desc = getString(R.string.fine_loc_message)
-                    )
+                        createDialog(
+                            context = this,
+                            title = getString(R.string.permission_not_granted),
+                            desc = getString(R.string.fine_loc_message),
+                            isPermissionCheckedOnce
+                        )
+                    }
                 }
+            } else {
+                createDialog(
+                    context = this,
+                    title = "Permission has already been refused",
+                    desc = "Enable Permissions through settings",
+                    isPermissionCheckedOnce
+                )
             }
+            isPermissionCheckedOnce = true
         }
 
         locationPermissionRequest.launch(
@@ -79,19 +103,27 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    private fun createDialog(context: Context, title: String, desc: String) {
+    private fun createDialog(
+        context: Context,
+        title: String,
+        desc: String,
+        isPermissionAlreadyChecked: Boolean
+    ) {
         val dialog = AlertDialog.Builder(context)
             .setTitle(title)
             .setMessage(desc)
             .setCancelable(true)
-            .setPositiveButton(getString(R.string.grant_permission)) { currentDialog, _ ->
-                currentDialog.cancel()
-                locationPermissionRequest.launch(
-                    locationPermissionList
-                )
-            }
             .setNegativeButton(getString(R.string.deny)) { _, _ ->
                 finish()
+            }.also { builder ->
+                if (!isPermissionAlreadyChecked) {
+                    builder.setPositiveButton(getString(R.string.grant_permission)) { currentDialog, _ ->
+                        currentDialog.cancel()
+                        locationPermissionRequest.launch(
+                            locationPermissionList
+                        )
+                    }
+                }
             }.create()
 
         dialog.setCanceledOnTouchOutside(false)
