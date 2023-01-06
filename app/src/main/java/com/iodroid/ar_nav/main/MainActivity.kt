@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
     internal lateinit var binding: ActivityMainBinding
     internal val viewModel: NavSharedViewModel by viewModels()
     lateinit var locationPermissionRequest: ActivityResultLauncher<Array<String>>
-    val locationPermissionList = arrayOf(
+    private val locationPermissionList = arrayOf(
         Manifest.permission.ACCESS_FINE_LOCATION,
         Manifest.permission.ACCESS_COARSE_LOCATION
     )
