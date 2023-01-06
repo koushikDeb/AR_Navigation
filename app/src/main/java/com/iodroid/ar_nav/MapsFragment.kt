@@ -12,7 +12,6 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.libraries.places.api.model.Place
 
 class MapsFragment : Fragment() {
@@ -28,11 +27,6 @@ class MapsFragment : Fragment() {
         viewModel.endPlace.value?.let { end ->
             Log.e("Set end marker", "done")
             setMarker(end)
-        }
-        Log.e("Set polyline", "not reached")
-        if (viewModel.startPlace.value != null && viewModel.endPlace.value != null) {
-            Log.e("Set polyline", "reached")
-            makePolylines()
         }
     }
 
@@ -60,23 +54,6 @@ class MapsFragment : Fragment() {
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFragment?.getMapAsync(callback)
         locationSetListeners()
-    }
-
-    private fun makePolylines() {
-        Log.e("Set polyline", "reached")
-
-        val polyline = googleMap?.addPolyline(
-            PolylineOptions()
-                .clickable(true)
-                .add(
-                    viewModel.startPlace.value?.latLng,
-                    viewModel.endPlace.value?.latLng
-                )
-                .visible(true)
-                .color(10)
-        )
-
-        Log.e("Set polyline", "outro")
     }
 
     private fun locationSetListeners() {

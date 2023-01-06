@@ -3,5 +3,9 @@
   <string name="start_location">Enter Start Location</string>
   <string name="end_location">Enter End Location</string>
   <string name="start_navigation">Start</string>
-  <string name="api_key">ADD_YOUR_API_KEY_HERE</string>
+  <string name="api_key">AIzaSyBWV1jjPwu8j-CRZs4WcbmQz_OCRv2X_bo</string>
+  <string name="grant_permission">Grant permission</string>
+  <string name="deny">Deny</string>
+  <string name="fine_loc_message">App requires fine location permission</string>
+  <string name="permission_not_granted">Permission not granted</string>
 </resources>
