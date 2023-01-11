@@ -6,20 +6,20 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.libraries.places.api.model.Place
 import com.google.maps.DirectionsApi
+import com.google.maps.model.TrafficModel
 import com.iodroid.ar_nav.utils.PlacesUtils
 import com.iodroid.ar_nav.utils.PlacesUtils.getStringFormattedLatLang
+import com.iodroid.ar_nav.utils.PlacesUtils.toLatLang
 import kotlin.random.Random
 
 class MapsFragment : Fragment() {
@@ -86,14 +86,15 @@ class MapsFragment : Fragment() {
                 context,
                 getStringFormattedLatLang(viewModel.startPlace.value),
                 getStringFormattedLatLang(viewModel.endPlace.value)
-            ).alternatives(true).optimizeWaypoints(true)
+            ).alternatives(true)
+                .departureTimeNow()
+                .trafficModel(TrafficModel.BEST_GUESS)
+                .optimizeWaypoints(true)
             try {
                 val routes = directionsRequest.await().routes
 
                 for (route in routes) {
-                    val polyline = route.overviewPolyline.decodePath().map { latLang ->
-                        LatLng(latLang.lat, latLang.lng)
-                    }
+                    val polyline = route.overviewPolyline.decodePath().toLatLang()
                     val colour = Color.argb(
                         255,
                         Random.nextInt(256),
@@ -101,11 +102,25 @@ class MapsFragment : Fragment() {
                         Random.nextInt(256)
                     )
 
-                    googleMap?.addPolyline(
+                    val polylineResponse = googleMap?.addPolyline(
                         PolylineOptions()
                             .addAll(polyline)
                             .color(colour)
+                            .clickable(true)
                     )
+                    viewModel.setAvailableRoutes(polylineResponse)
+                }
+
+                googleMap?.setOnPolylineClickListener {
+                    val polylines = viewModel.availableRoutes.value?.filter { poly ->
+                        poly != it
+                    }
+                    polylines?.forEach { poly ->
+                        poly.color = Color.DKGRAY
+                    }
+                    it.color = Color.BLUE
+
+                    Log.e("Polyline clicked", it.id)
                 }
             } catch (e: Exception) {
                 Log.e("Directions request exception", e.message.orEmpty())
