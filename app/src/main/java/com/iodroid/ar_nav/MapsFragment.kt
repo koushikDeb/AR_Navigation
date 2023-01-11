@@ -13,6 +13,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.libraries.places.api.model.Place
 import com.google.maps.DirectionsApi
@@ -26,13 +27,14 @@ class MapsFragment : Fragment() {
 
     private val viewModel: NavSharedViewModel by activityViewModels()
     private var googleMap: GoogleMap? = null
+    private var prevPolyline: Polyline? = null
 
     private val callback = OnMapReadyCallback { map ->
         googleMap = map
-        viewModel.startPlace.value?.let { start ->
+        viewModel.startPlaceLivedata.value?.let { start ->
             setMarker(start)
         }
-        viewModel.endPlace.value?.let { end ->
+        viewModel.endPlaceLiveData.value?.let { end ->
             setMarker(end)
         }
     }
@@ -64,14 +66,14 @@ class MapsFragment : Fragment() {
     }
 
     private fun locationSetListeners() {
-        viewModel.startPlace.observe(viewLifecycleOwner) { start ->
+        viewModel.startPlaceLivedata.observe(viewLifecycleOwner) { start ->
             start?.let { setMarker(it) }
         }
-        viewModel.endPlace.observe(viewLifecycleOwner) { end ->
+        viewModel.endPlaceLiveData.observe(viewLifecycleOwner) { end ->
             end?.let {
                 setMarker(it)
 
-                if (viewModel.startPlace.value != null) {
+                if (viewModel.startPlaceLivedata.value != null) {
                     getRoutePolyline()
                 }
             }
@@ -84,8 +86,8 @@ class MapsFragment : Fragment() {
         geoContext?.let { context ->
             val directionsRequest = DirectionsApi.getDirections(
                 context,
-                getStringFormattedLatLang(viewModel.startPlace.value),
-                getStringFormattedLatLang(viewModel.endPlace.value)
+                getStringFormattedLatLang(viewModel.startPlaceLivedata.value),
+                getStringFormattedLatLang(viewModel.endPlaceLiveData.value)
             ).alternatives(true)
                 .departureTimeNow()
                 .trafficModel(TrafficModel.BEST_GUESS)
@@ -108,19 +110,30 @@ class MapsFragment : Fragment() {
                             .color(colour)
                             .clickable(true)
                     )
-                    viewModel.setAvailableRoutes(polylineResponse)
+                    viewModel.setPolylinesMarked(polyline = polylineResponse, route = route)
                 }
 
-                googleMap?.setOnPolylineClickListener {
-                    val polylines = viewModel.availableRoutes.value?.filter { poly ->
-                        poly != it
-                    }
-                    polylines?.forEach { poly ->
-                        poly.color = Color.DKGRAY
-                    }
-                    it.color = Color.BLUE
+                googleMap?.setOnPolylineClickListener { chosenPolyline ->
+                    if (prevPolyline == null || prevPolyline != chosenPolyline) {
+                        prevPolyline = chosenPolyline
+                        val routesPolyLinesPair = viewModel.plottedPolylineRoutesLiveData.value
+                        val polyLinesList = routesPolyLinesPair?.map { pair ->
+                            pair.first
+                        }
+                        val polylines = polyLinesList?.filter { poly ->
+                            poly != chosenPolyline
+                        }
+                        polylines?.forEach { poly ->
+                            poly.color = Color.DKGRAY
+                        }
+                        chosenPolyline.color = Color.BLUE
 
-                    Log.e("Polyline clicked", it.id)
+                        val chosenRoute = routesPolyLinesPair?.first { pair ->
+                            pair.first == chosenPolyline
+                        }?.second
+
+                        viewModel.setChosenRoute(chosenRoute)
+                    }
                 }
             } catch (e: Exception) {
                 Log.e("Directions request exception", e.message.orEmpty())

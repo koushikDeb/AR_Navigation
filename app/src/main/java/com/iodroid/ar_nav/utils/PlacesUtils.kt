@@ -7,7 +7,7 @@ import com.google.maps.GeoApiContext
 import com.iodroid.ar_nav.R
 
 object PlacesUtils {
-    val placesRequiredElmentList = listOf(Place.Field.LAT_LNG, Place.Field.NAME)
+    val placesRequiredElmentList = listOf(Place.Field.ID,Place.Field.LAT_LNG, Place.Field.NAME)
 
     fun getGeoContext(context: Context): GeoApiContext? {
         return GeoApiContext.Builder()

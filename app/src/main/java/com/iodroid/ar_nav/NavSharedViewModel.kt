@@ -5,48 +5,50 @@ import androidx.lifecycle.ViewModel
 import com.google.android.gms.maps.model.Polyline
 import com.google.android.libraries.places.api.model.Place
 import com.google.maps.model.DirectionsRoute
-import com.google.maps.model.EncodedPolyline
 
 class NavSharedViewModel : ViewModel() {
 
-    var startPlace: MutableLiveData<Place?> = MutableLiveData(null)
+    var startPlaceLivedata: MutableLiveData<Place?> = MutableLiveData(null)
         private set
 
     var orientation: MutableLiveData<Int> = MutableLiveData(1)
         private set
 
-    var endPlace: MutableLiveData<Place?> = MutableLiveData(null)
+    var endPlaceLiveData: MutableLiveData<Place?> = MutableLiveData(null)
         private set
 
-    var availableRoutes: MutableLiveData<MutableList<Polyline>?> = MutableLiveData(mutableListOf())
+    var plottedPolylineRoutesLiveData: MutableLiveData<MutableList<Pair<Polyline, DirectionsRoute>>?> =
+        MutableLiveData(mutableListOf())
         private set
 
-    var chosenRoute: MutableLiveData<DirectionsRoute> = MutableLiveData()
+    var chosenRouteLiveData: MutableLiveData<DirectionsRoute> = MutableLiveData()
         private set
 
     val fields = listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG)
 
     fun setStart(start: Place) {
-        startPlace.value = start
+        startPlaceLivedata.value = start
     }
 
     fun setEnd(end: Place) {
-        endPlace.value = end
+        endPlaceLiveData.value = end
     }
 
     fun setOrientation(orient: Int) {
         orientation.value = orient
     }
 
-    fun setAvailableRoutes(polyline: Polyline?) {
+    fun setPolylinesMarked(polyline: Polyline?, route: DirectionsRoute) {
         polyline?.let { poly ->
-            val currentPolylineList = availableRoutes.value
-            currentPolylineList?.add(poly)
-            availableRoutes.postValue(currentPolylineList)
+            val currentPolylineList = plottedPolylineRoutesLiveData.value
+            currentPolylineList?.add(Pair(poly, route))
+            plottedPolylineRoutesLiveData.postValue(currentPolylineList)
         }
     }
 
-    fun setChosenRoute(route: DirectionsRoute) {
-        chosenRoute.postValue(route)
+    fun setChosenRoute(route: DirectionsRoute?) {
+        route?.let { chosenRoute ->
+            chosenRouteLiveData.postValue(chosenRoute)
+        }
     }
 }
