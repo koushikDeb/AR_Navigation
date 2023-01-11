@@ -19,6 +19,7 @@ import com.google.android.libraries.places.api.model.Place
 import com.google.maps.DirectionsApi
 import com.google.maps.model.TrafficModel
 import com.iodroid.ar_nav.utils.PlacesUtils
+import com.iodroid.ar_nav.utils.PlacesUtils.addInfoWindow
 import com.iodroid.ar_nav.utils.PlacesUtils.getStringFormattedLatLang
 import com.iodroid.ar_nav.utils.PlacesUtils.toLatLang
 import kotlin.random.Random
@@ -116,6 +117,7 @@ class MapsFragment : Fragment() {
                 googleMap?.setOnPolylineClickListener { chosenPolyline ->
                     if (prevPolyline == null || prevPolyline != chosenPolyline) {
                         prevPolyline = chosenPolyline
+
                         val routesPolyLinesPair = viewModel.plottedPolylineRoutesLiveData.value
                         val polyLinesList = routesPolyLinesPair?.map { pair ->
                             pair.first
@@ -133,6 +135,12 @@ class MapsFragment : Fragment() {
                         }?.second
 
                         viewModel.setChosenRoute(chosenRoute)
+
+                        chosenPolyline.addInfoWindow(
+                            googleMap,
+                            chosenRoute?.legs?.firstOrNull()?.durationInTraffic.toString(),
+                            chosenRoute?.legs?.firstOrNull()?.distance.toString()
+                        )
                     }
                 }
             } catch (e: Exception) {
