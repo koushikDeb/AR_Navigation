@@ -20,7 +20,9 @@ import com.iodroid.ar_nav.utils.PlacesUtils.placesRequiredElmentList
 import com.iodroid.ar_nav.utils.isLocationPermissionGranted
 
 class MainActivity : AppCompatActivity() {
-
+/**
+ * Data model - Check number of calls directions route is having
+ */
     var isPermissionCheckedOnce = false
 
     internal lateinit var binding: ActivityMainBinding

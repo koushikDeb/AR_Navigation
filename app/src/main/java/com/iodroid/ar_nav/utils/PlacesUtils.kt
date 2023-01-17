@@ -2,6 +2,7 @@ package com.iodroid.ar_nav.utils
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Color
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
@@ -47,6 +48,14 @@ object PlacesUtils {
     fun List<com.google.maps.model.LatLng>.toLatLang(): List<LatLng> {
         return this.map { latLang ->
             LatLng(latLang.lat, latLang.lng)
+        }
+    }
+
+    fun getColour(index: Int): Int {
+        return if (index == 0) {
+            Color.BLUE
+        } else {
+            Color.GRAY
         }
     }
 }

@@ -24,8 +24,6 @@ class NavSharedViewModel : ViewModel() {
     var chosenRouteLiveData: MutableLiveData<DirectionsRoute> = MutableLiveData()
         private set
 
-    val fields = listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG)
-
     fun setStart(start: Place) {
         startPlaceLivedata.value = start
     }
