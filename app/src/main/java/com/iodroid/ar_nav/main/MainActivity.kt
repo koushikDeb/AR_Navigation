@@ -16,10 +16,13 @@ import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.iodroid.ar_nav.NavSharedViewModel
 import com.iodroid.ar_nav.R
 import com.iodroid.ar_nav.databinding.ActivityMainBinding
+import com.iodroid.ar_nav.utils.PlacesUtils.placesRequiredElmentList
 import com.iodroid.ar_nav.utils.isLocationPermissionGranted
 
 class MainActivity : AppCompatActivity() {
-
+/**
+ * Data model - Check number of calls directions route is having
+ */
     var isPermissionCheckedOnce = false
 
     internal lateinit var binding: ActivityMainBinding
@@ -141,6 +144,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     internal fun getAutoCompleteIntent() =
-        Autocomplete.IntentBuilder(AutocompleteActivityMode.FULLSCREEN, viewModel.fields)
+        Autocomplete.IntentBuilder(AutocompleteActivityMode.FULLSCREEN, placesRequiredElmentList)
             .build(this)
 }

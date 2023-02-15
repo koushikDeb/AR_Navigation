@@ -25,10 +25,10 @@ internal fun MainActivity.initListeners() {
         startActivityForResult(getAutoCompleteIntent(), END_REQUEST_CODE)
     }
 
-    viewModel.startPlace.observe(this) { start ->
+    viewModel.startPlaceLivedata.observe(this) { start ->
         binding.startLocationTv.text = start?.name ?: getString(R.string.start_location)
     }
-    viewModel.endPlace.observe(this) { end ->
+    viewModel.endPlaceLiveData.observe(this) { end ->
         binding.endLocationTv.text = end?.name ?: getString(R.string.end_location)
     }
 }

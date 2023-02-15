@@ -2,31 +2,51 @@ package com.iodroid.ar_nav
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.google.android.gms.maps.model.Polyline
 import com.google.android.libraries.places.api.model.Place
+import com.google.maps.model.DirectionsRoute
 
-class NavSharedViewModel: ViewModel() {
+class NavSharedViewModel : ViewModel() {
 
-    var startPlace: MutableLiveData<Place?>  = MutableLiveData(null)
+    var startPlaceLivedata: MutableLiveData<Place?> = MutableLiveData(null)
         private set
 
-    var orientation: MutableLiveData<Int>  = MutableLiveData(1)
+    var orientation: MutableLiveData<Int> = MutableLiveData(1)
         private set
 
-    var endPlace: MutableLiveData<Place?>  = MutableLiveData(null)
+    var endPlaceLiveData: MutableLiveData<Place?> = MutableLiveData(null)
         private set
 
-    val fields = listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG)
+    var plottedPolylineRoutesLiveData: MutableLiveData<MutableList<Pair<Polyline, DirectionsRoute>>?> =
+        MutableLiveData(mutableListOf())
+        private set
 
-    fun setStart(start: Place){
-        startPlace.value = start
+    var chosenRouteLiveData: MutableLiveData<DirectionsRoute> = MutableLiveData()
+        private set
+
+    fun setStart(start: Place) {
+        startPlaceLivedata.value = start
     }
 
-    fun setEnd(end: Place){
-        endPlace.value = end
+    fun setEnd(end: Place) {
+        endPlaceLiveData.value = end
     }
 
-    fun setOrientation(orint:Int){
-        orientation.value = orint
+    fun setOrientation(orient: Int) {
+        orientation.value = orient
     }
 
+    fun setPolylinesMarked(polyline: Polyline?, route: DirectionsRoute) {
+        polyline?.let { poly ->
+            val currentPolylineList = plottedPolylineRoutesLiveData.value
+            currentPolylineList?.add(Pair(poly, route))
+            plottedPolylineRoutesLiveData.postValue(currentPolylineList)
+        }
+    }
+
+    fun setChosenRoute(route: DirectionsRoute?) {
+        route?.let { chosenRoute ->
+            chosenRouteLiveData.postValue(chosenRoute)
+        }
+    }
 }
